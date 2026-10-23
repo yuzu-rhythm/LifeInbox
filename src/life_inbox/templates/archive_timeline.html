@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Life Archive | 生活マイページ{% endblock %}
+
+{% block content %}
+<div class="page-heading archive-heading">
+  <div>
+    <p class="eyebrow">LIFE ARCHIVE</p>
+    <h1>生活アーカイブ</h1>
+    <p>Discord・Webから保存した記録を横断検索し、元データ・Notionへの昇格状態・添付画像を同じ場所で確認できます。</p>
+  </div>
+  <div class="heading-total">
+    <span>該当するローカル記録</span>
+    <strong>{{ local_total }}件</strong>
+    <small>最大{{ archive_limit }}件表示・無限スクロールなし</small>
+  </div>
+</div>
+
+<section class="panel archive-privacy-note" aria-label="保存先と公開範囲">
+  <div>
+    <strong>正本は非公開のローカルSQLite</strong>
+    <p>Notionは見やすく残したい記録だけを送る二次アーカイブです。未昇格の記録もこのWebでは検索できます。</p>
+  </div>
+  <div class="archive-destination-actions">
+    {% if notion_hub_url %}
+    <a class="button-link" href="{{ notion_hub_url }}" target="_blank" rel="noreferrer">Notion Life Archiveを開く</a>
+    {% else %}
+    <span class="status-badge status-neutral">Notionリンク未設定</span>
+    {% endif %}
+    <a class="button-link button-secondary" href="/archive/health">同期ヘルスを見る</a>
+  </div>
+</section>
+
+<div class="metric-grid archive-library-metrics">
+  <div class="metric card"><span>検索結果</span><strong>{{ local_total }}件</strong><small>{{ local_displayed }}件を表示中</small></div>
+  <div class="metric card"><span>画像付き</span><strong>{{ local_media_total }}件</strong><small>写真・リザルトを絞り込み可能</small></div>
+  <div class="metric card"><span>確認待ち</span><strong>{{ local_pending_total }}件</strong><small>元データは削除せず保持</small></div>
+  <div class="metric card"><span>Notion同期済み</span><strong>{{ local_notion_synced_total }}件</strong><small>{% if notion_sync_enabled %}Bot同期は有効{% else %}Bot同期は現在オフ{% endif %}</small></div>
+</div>
+
+<section class="panel archive-library-panel" aria-labelledby="local-records-heading">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">LOCAL RECORDS</p>
+      <h2 id="local-records-heading">Discord・Webの保存記録</h2>
+    </div>
+    <span class="section-count" aria-live="polite">{{ local_displayed }} / {{ local_total }}件</span>
+  </div>
+
+  <h3 id="archive-filters-heading" class="visually-hidden">ローカル記録を絞り込む</h3>
+  <form class="filters archive-filters" method="get" action="/archive" role="search" aria-labelledby="archive-filters-heading">
+    <label class="archive-query-field" for="archive-query">キーワード
+      <input id="archive-query" type="search" name="q" value="{{ archive_query }}" maxlength="80" placeholder="店名、金額、メモ、曲名、会社名…">
+    </label>
+    <label for="archive-status">状態
+      <select id="archive-status" name="status">
+        <option value="all" {% if archive_status == 'all' %}selected{% endif %}>すべて</option>
+        {% for value, label in archive_status_options %}
+        <option value="{{ value }}" {% if archive_status == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label for="archive-kind">種類
+      <select id="archive-kind" name="kind">
+        <option value="all" {% if archive_kind == 'all' %}selected{% endif %}>すべて</option>
+        {% for value, label in archive_kind_options %}
+        <option value="{{ value }}" {% if archive_kind == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label for="archive-media">画像
+      <select id="archive-media" name="media">
+        <option value="all" {% if archive_media == 'all' %}selected{% endif %}>すべて</option>
+        <option value="with" {% if archive_media == 'with' %}selected{% endif %}>画像付きのみ</option>
+      </select>
+    </label>
+    <label for="archive-limit">表示数
+      <select id="archive-limit" name="limit">
+        {% for value in [25, 50, 100] %}
+        <option value="{{ value }}" {% if archive_limit == value %}selected{% endif %}>{{ value }}件</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button type="submit" aria-label="検索条件を適用">検索する</button>
+    <a href="/archive">条件をクリア</a>
+  </form>
+
+  {% if local_entries %}
+  <div class="local-archive-grid">
+    {% for entry in local_entries %}
+    <article class="local-archive-card">
+      {% if entry.attachment_id %}
+      <a class="local-archive-image" href="/events/{{ entry.event_id }}" aria-label="{{ entry.title }}の詳細へ">
+        <img src="/attachments/{{ entry.attachment_id }}" alt="{{ entry.title }}の添付画像" loading="lazy">
+        {% if entry.attachment_count > 1 %}<span>画像 {{ entry.attachment_count }}枚</span>{% endif %}
+      </a>
+      {% endif %}
+      <div class="local-archive-body">
+        <div class="local-archive-badges">
+          <span class="status-badge status-{{ entry.status_tone }}">{{ entry.status_label }}</span>
+          {% for label in entry.kind_labels %}<span class="tag">{{ label }}</span>{% endfor %}
+          <span class="status-badge status-{{ entry.notion_tone }}">{{ entry.notion_status_label }}</span>
+        </div>
+        <h3><a href="/events/{{ entry.event_id }}">{{ entry.title }}</a></h3>
+        {% if entry.raw_text and entry.raw_text != entry.title %}<p>{{ entry.raw_text }}</p>{% endif %}
+        <footer>
+          <span>{{ entry.occurred_label }} · {{ entry.source }}</span>
+          <strong>{{ entry.detail }}</strong>
+        </footer>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  {% set archive_has_filters = archive_query or archive_status != 'all' or archive_kind != 'all' or archive_media != 'all' %}
+  <div class="empty-block archive-empty-state" role="status" aria-live="polite">
+    {% if archive_has_filters %}
+    <h3>条件に一致する記録はありません</h3>
+    <p>条件を変えるか、条件をクリアしてください。新しい記録は「すぐ記録」またはDiscordの「なんでも入力」から保存できます。</p>
+    <div class="archive-empty-actions">
+      <a class="button-link button-secondary" href="/archive">条件をクリア</a>
+      <a class="button-link" href="/quick">すぐ記録を開く</a>
+    </div>
+    {% else %}
+    <h3>ローカル記録はまだありません</h3>
+    <p>保存した記録はローカルSQLiteを正本としてここに表示されます。Notionには自動公開されず、明示的に選んだ記録だけが二次アーカイブへ送られます。</p>
+    <div class="archive-empty-actions">
+      <a class="button-link" href="/quick">すぐ記録を開く</a>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+</section>
+
+<section class="panel archive-timeline-panel" aria-labelledby="archive-list-heading">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">KISEKI / PROVIDER PROJECTION</p>
+      <h2 id="archive-list-heading">外部ソースのアーカイブ投影</h2>
+    </div>
+    <span class="section-count">{{ entries|length }}件表示</span>
+  </div>
+  <p class="archive-projection-note">上のローカルEventとは別の、Kisekiなどが送るprovider-neutralな投影です。fixture確認と実サービス同期を混同しません。</p>
+  {% if entries %}
+  <div class="archive-entry-list">
+    {% for entry in entries %}
+    <article class="archive-entry-card">
+      <div class="archive-entry-heading">
+        <div>
+          <span class="tag">{{ entry.source }}</span>
+          <h3>{{ entry.title }}</h3>
+        </div>
+        <span class="status-badge status-{{ 'success' if entry.sync_status == 'synced' else 'warning' if entry.sync_status in ['quarantined', 'retrying', 'pending', 'processing'] else 'danger' if entry.sync_status in ['failed', 'reconciliation_required'] else 'neutral' }}">{{ entry.sync_status }}</span>
+      </div>
+      {% if entry.original_text %}<p class="archive-entry-text">{{ entry.original_text }}</p>{% endif %}
+      <dl class="archive-entry-meta">
+        <div><dt>発生時刻</dt><dd>{{ entry.occurred_label }}</dd></div>
+        <div><dt>観測時刻</dt><dd>{{ entry.observed_label }}</dd></div>
+        <div><dt>保存時刻</dt><dd>{{ entry.captured_label }}</dd></div>
+        <div><dt>revision</dt><dd>{{ entry.revision }}</dd></div>
+        <div><dt>provenance</dt><dd>{{ entry.provenance }}</dd></div>
+        <div><dt>confidence</dt><dd>{{ entry.confidence_label }}</dd></div>
+      </dl>
+      {% if entry.attachment_count %}
+      <p class="archive-entry-attachment">添付 {{ entry.attachment_count }}件{% if entry.quarantined_attachment_count %}（隔離 {{ entry.quarantined_attachment_count }}件）{% endif %}</p>
+      {% endif %}
+      <small class="archive-entry-id">Archive ID: {{ entry.archive_id }}</small>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-block archive-empty-state" role="status" aria-live="polite">
+    <h3>外部ソースの投影はまだありません</h3>
+    <p>Kisekiまたはprovider-neutralな取り込みが成功すると、ここへ表示されます。</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}予算 | 生活マイページ{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">月次の家計管理</p>
+    <h1>{{ month_label }}の予算</h1>
+    <p>支出として表示するのは、指定月に発生した確定済みのExpenseだけです。収入・振替・確認待ちは含みません。</p>
+  </div>
+</div>
+
+<form class="filters" method="get" aria-label="予算の月選択">
+  <label>月<input type="month" name="month" value="{{ selected_month }}"></label>
+  <button type="submit">表示</button><a href="/budgets">今月に戻る</a>
+</form>
+
+{% if overall %}
+<section class="panel budget-overview" aria-labelledby="budget-overall-heading">
+  <div class="section-heading"><div><p class="eyebrow">全体</p><h2 id="budget-overall-heading">月の支出上限</h2></div><span class="budget-month">{{ selected_month }}</span></div>
+  <div class="budget-numbers"><div><span>使用</span><strong>{{ "{:,}".format(overall.spent) }}円</strong></div><div><span>上限</span><strong>{{ "{:,}".format(overall.amount) }}円</strong></div><div class="{{ 'negative' if overall.remaining < 0 else '' }}"><span>{{ '超過' if overall.remaining < 0 else '残り' }}</span><strong>{{ "{:,}".format(-overall.remaining if overall.remaining < 0 else overall.remaining) }}円</strong></div></div>
+  <div class="budget-progress" role="progressbar" aria-label="全体予算の使用率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ overall.visual_percent }}" aria-valuetext="使用率 {{ '%.1f'|format(overall.percent) }}%"><span style="width: {{ overall.visual_percent }}%"></span></div>
+  <p class="budget-caption">使用率 {{ "%.1f"|format(overall.percent) }}%{% if overall.remaining < 0 %}（上限を超えています）{% endif %}</p>
+</section>
+{% endif %}
+
+{% if category_budgets %}
+<section class="panel budget-category-panel" aria-labelledby="budget-category-heading">
+  <div class="section-heading"><div><p class="eyebrow">カテゴリ別</p><h2 id="budget-category-heading">設定したカテゴリ予算</h2></div><span class="budget-month">{{ category_budgets|length }}件</span></div>
+  <div class="budget-list">
+    {% for item in category_budgets %}
+    <article class="budget-row"><div class="budget-row-heading"><h3>{{ item.category }}</h3><span>上限 {{ "{:,}".format(item.amount) }}円</span></div><div class="budget-progress" role="progressbar" aria-label="{{ item.category }}予算の使用率" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ item.visual_percent }}" aria-valuetext="使用率 {{ '%.1f'|format(item.percent) }}%"><span style="width: {{ item.visual_percent }}%"></span></div><div class="budget-row-meta"><span>使用 {{ "{:,}".format(item.spent) }}円（{{ "%.1f"|format(item.percent) }}%）</span><strong class="{{ 'negative' if item.remaining < 0 else '' }}">{% if item.remaining < 0 %}超過 {{ "{:,}".format(-item.remaining) }}円{% else %}残り {{ "{:,}".format(item.remaining) }}円{% endif %}</strong></div></article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if not overall and not category_budgets %}
+<section class="panel budget-empty" aria-labelledby="budget-empty-heading"><p class="eyebrow">まだ設定されていません</p><h2 id="budget-empty-heading">この月の予算は未設定です</h2><p>Discordの <strong>#口座</strong> で <code>/budget_set</code> を使うと、全体またはカテゴリ別の予算を設定できます。</p></section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.life-inbox.web</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>__ABS_PYTHON_BIN__</string>
+		<string>-m</string>
+		<string>life_inbox</string>
+		<string>web</string>
+	</array>
+	<key>WorkingDirectory</key>
+	<string>__ABS_PROJECT_DIR__</string>
+	<key>RunAtLoad</key>
+	<true/>
+	<!-- Restart a crashed process, but do not spin after an intentional clean exit. -->
+	<key>KeepAlive</key>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
+	<key>ThrottleInterval</key>
+	<integer>30</integer>
+	<key>ProcessType</key>
+	<string>Interactive</string>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PYTHONUNBUFFERED</key>
+		<string>1</string>
+	</dict>
+	<key>StandardOutPath</key>
+	<string>__ABS_LOG_DIR__/web.stdout.log</string>
+	<key>StandardErrorPath</key>
+	<string>__ABS_LOG_DIR__/web.stderr.log</string>
+</dict>
+</plist>

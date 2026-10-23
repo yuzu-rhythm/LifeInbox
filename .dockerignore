@@ -1,0 +1,41 @@
+.git
+.git/**
+.gitignore
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Personal and ephemeral runtime data.
+data/
+**/data/
+*.db
+*.sqlite
+*.sqlite3
+**/attachments/
+**/backups/
+**/exports/
+**/sessions/
+**/*browser-profile*/
+
+# Local development artifacts and tests are not part of the runtime image.
+.venv/
+venv/
+.egg-info/
+**/*.egg-info/
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+tests/
+docs/
+
+# Do not send local credentials or personal binary artifacts as build context.
+**/*.pem
+**/*.key
+**/*credential*
+**/*secret*
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.gif
+**/*.webp

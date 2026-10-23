@@ -1,0 +1,60 @@
+<article class="rhythm-status-card panel">
+  <div class="rhythm-status-heading">
+    <div class="game-title">
+      <span class="game-logo {{ rhythm_status.key }}" aria-hidden="true">{{ rhythm_status.short }}</span>
+      <div>
+        <h2>{{ rhythm_status.label }}</h2>
+        <p class="status-subline">{{ rhythm_status.provider_label }}</p>
+      </div>
+    </div>
+    <div class="status-badges" aria-label="{{ rhythm_status.label }}の状態">
+      <span class="status-badge status-{{ rhythm_status.source_tone }}">{{ rhythm_status.source_label }}</span>
+      <span class="status-badge status-{{ rhythm_status.status_tone }}">{{ rhythm_status.status_label }}</span>
+    </div>
+  </div>
+
+  <dl class="rhythm-facts">
+    <div><dt>最新レート</dt><dd><strong>{{ rhythm_status.latest_rating_label }}</strong><small>{{ rhythm_status.latest_collected_label }}</small></dd></div>
+    <div><dt>前回</dt><dd>{{ rhythm_status.previous_rating_label }}</dd></div>
+    <div><dt>差分</dt><dd class="{{ 'positive' if rhythm_status.delta_label.startswith('+') else 'negative' if rhythm_status.delta_label.startswith('-') else '' }}">{{ rhythm_status.delta_label }}</dd></div>
+  </dl>
+
+  <div class="rhythm-status-meta">
+    <span>最終成功: {{ rhythm_status.last_success_label }}</span>
+    <span>最終試行: {{ rhythm_status.last_attempt_label }}</span>
+    <span>最終失敗: {{ rhythm_status.last_failure_label }}</span>
+  </div>
+  {% if rhythm_status.error_label %}<p class="state-message state-danger" role="status">{{ rhythm_status.error_label }}</p>{% endif %}
+
+  {% if rhythm_status.image_url %}
+  <a class="rhythm-image-link" href="{{ rhythm_status.image_url }}" target="_blank" rel="noreferrer noopener">
+    <img src="{{ rhythm_status.image_url }}" alt="{{ rhythm_status.label }}の保存済みレート画像">
+    <span>{{ rhythm_status.image_label }}・拡大して開く ↗</span>
+  </a>
+  {% else %}
+  <p class="image-state">{{ rhythm_status.image_label }}。保存済みの検証済み画像だけを表示します。</p>
+  {% endif %}
+
+  {% if show_history|default(false) %}
+  <details class="rhythm-history">
+    <summary>履歴（{{ rhythm_status.history|length }}件）</summary>
+    {% if rhythm_status.history %}
+    <div class="history-table">
+      <table>
+        <thead><tr><th>取得日時</th><th class="num">レート</th><th class="num">差分</th><th>画像</th></tr></thead>
+        <tbody>
+        {% for item in rhythm_status.history %}
+        <tr>
+          <td>{{ item.collected_label }}</td>
+          <td class="num">{{ item.rating_label }}<small>前回 {{ item.previous_rating_label }}</small></td>
+          <td class="num">{{ item.delta_label }}</td>
+          <td>{% if item.image_url %}<a href="{{ item.image_url }}" target="_blank" rel="noreferrer noopener">{{ item.image_label }} ↗</a>{% else %}{{ item.image_label }}{% endif %}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}<p class="empty compact">レート履歴はまだありません。</p>{% endif %}
+  </details>
+  {% endif %}
+</article>

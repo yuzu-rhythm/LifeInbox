@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123f2b">
+  <title>{% block title %}生活マイページ{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">本文へ移動</a>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="生活マイページの概要へ">
+      <span class="brand-mark" aria-hidden="true">生</span>
+      <span><strong>生活マイページ</strong><small>Discordから育つ、私だけの生活記録</small></span>
+    </a>
+    <nav class="primary-nav" aria-label="主要メニュー">
+      <a class="quick-nav {{ 'active' if page == 'quick' else '' }}" href="/quick" {% if page == 'quick' %}aria-current="page"{% endif %}>すぐ記録</a>
+      <a class="{{ 'active' if page == 'dashboard' or page == 'event_detail' else '' }}" href="/" {% if page == 'dashboard' or page == 'event_detail' %}aria-current="page"{% endif %}>概要</a>
+      <a class="{{ 'active' if page == 'transactions' else '' }}" href="/transactions" {% if page == 'transactions' %}aria-current="page"{% endif %}>支出</a>
+      <a class="{{ 'active' if page == 'budgets' else '' }}" href="/budgets" {% if page == 'budgets' %}aria-current="page"{% endif %}>予算</a>
+      <a class="{{ 'active' if page == 'accounts' else '' }}" href="/accounts" {% if page == 'accounts' %}aria-current="page"{% endif %}>口座</a>
+      <a class="{{ 'active' if page == 'meals' else '' }}" href="/meals" {% if page == 'meals' %}aria-current="page"{% endif %}>食事</a>
+      <a class="{{ 'active' if page == 'memos' else '' }}" href="/memos" {% if page == 'memos' %}aria-current="page"{% endif %}>メモ</a>
+      <a class="{{ 'active' if page == 'social' else '' }}" href="/social" {% if page == 'social' %}aria-current="page"{% endif %}>SNS下書き</a>
+      <a class="{{ 'active' if page == 'rhythm' else '' }}" href="/rhythm" {% if page == 'rhythm' %}aria-current="page"{% endif %}>音ゲー</a>
+      <a class="{{ 'active' if page == 'career' else '' }}" href="/career" {% if page == 'career' %}aria-current="page"{% endif %}>就活</a>
+      <a class="{{ 'active' if page == 'tasks' else '' }}" href="/tasks" {% if page == 'tasks' %}aria-current="page"{% endif %}>タスク・日課</a>
+      <a class="{{ 'active' if page == 'archive' else '' }}" href="/archive" {% if page == 'archive' %}aria-current="page"{% endif %}>Life Archive</a>
+      <a class="{{ 'active' if page == 'archive_health' else '' }}" href="/archive/health" {% if page == 'archive_health' %}aria-current="page"{% endif %}>同期ヘルス</a>
+      <a class="{{ 'active' if page == 'guide' else '' }}" href="/guide" {% if page == 'guide' %}aria-current="page"{% endif %}>使い方</a>
+    </nav>
+  </header>
+  <main id="main-content" class="shell">
+    {% block content %}{% endblock %}
+  </main>
+  {% set runtime = namespace(cloud_read_only=false) %}
+  {% for middleware in request.app.user_middleware %}
+    {% if middleware.kwargs is defined and middleware.kwargs.dispatch is defined and middleware.kwargs.dispatch.__name__ == 'reject_cloud_state_changes' %}
+      {% set runtime.cloud_read_only = true %}
+    {% endif %}
+  {% endfor %}
+  {% if runtime.cloud_read_only %}
+  <footer class="site-footer">Cloud Runの読み取り専用スナップショットです。認証・アクセス制御（Googleログイン／IAP）はアプリではなくデプロイ側で行われます。記録の正本はローカルSQLiteで、この画面はその読み取り専用スナップショットを表示します。Notionは明示的に選んだ記録だけを送る二次アーカイブです。</footer>
+  {% else %}
+  <footer class="site-footer">この画面はこのMacの中だけで開いています。記録の正本はローカルSQLiteです。Notionは明示的に選んだ記録だけを送る二次アーカイブです。</footer>
+  {% endif %}
+</body>
+</html>

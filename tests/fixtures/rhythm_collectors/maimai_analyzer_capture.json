@@ -1,0 +1,46 @@
+{
+  "player_name": "Fixture Analyzer Player",
+  "rating": "14.32",
+  "cards": [
+    {
+      "frame": "new",
+      "title": "Analyzer New",
+      "difficulty": "master",
+      "chart_type": "DX",
+      "level": "Lv14.0",
+      "achievement": "100.5000%",
+      "song_rating": "14.82",
+      "song_id": "analyzer-new-001"
+    },
+    {
+      "frame": "best",
+      "title": "Analyzer Best",
+      "difficulty": "remaster",
+      "chart_type": "STD",
+      "level": "Lv13+AP",
+      "achievement": "100.0000%",
+      "song_rating": "14.51",
+      "song_id": "analyzer-best-001"
+    },
+    {
+      "frame": "candidate",
+      "title": "Analyzer Candidate With Unknown Rate",
+      "difficulty": "master",
+      "chart_type": "DX",
+      "level": "Lv14+",
+      "achievement": "99.5000%",
+      "song_rating": "???",
+      "song_id": "analyzer-candidate-unknown"
+    },
+    {
+      "frame": "candidate",
+      "title": "Analyzer Candidate",
+      "difficulty": "master",
+      "chart_type": "DX",
+      "level": "Lv13",
+      "achievement": "99.0000%",
+      "song_rating": "13.75",
+      "song_id": "analyzer-candidate-001"
+    }
+  ]
+}

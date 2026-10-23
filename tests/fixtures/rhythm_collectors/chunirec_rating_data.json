@@ -1,0 +1,152 @@
+{
+  "best": {
+    "value": 15.7,
+    "entries": [
+      {
+        "id": "song-best-001",
+        "title": "Best Song <safe>",
+        "diff": "MASTER",
+        "level": "14+",
+        "const": 14.7,
+        "score": 1005000,
+        "rating": 15.7,
+        "is_clear": true,
+        "is_fullcombo": true,
+        "is_alljustice": true,
+        "is_fullchain": true,
+        "is_const_unknown": false,
+        "is_played": true,
+        "genre": "Original",
+        "updated_at": "2026-08-28T10:00:00+09:00"
+      },
+      null,
+      {
+        "id": "song-best-002",
+        "title": "Second Best",
+        "diff": "EXPERT",
+        "level": "13",
+        "const": 13.2,
+        "score": 990000,
+        "rating": 14.1,
+        "is_clear": true,
+        "is_fullcombo": false,
+        "is_alljustice": false,
+        "is_fullchain": false,
+        "is_const_unknown": false,
+        "is_played": true,
+        "genre": "VARIETY",
+        "updated_at": "2026-08-27T10:00:00Z"
+      },
+      null, null, null, null, null, null, null, null,
+      null, null, null, null, null, null, null, null, null,
+      null, null, null, null, null, null, null, null, null, null
+    ]
+  },
+  "recent": {
+    "value": 14.3,
+    "entries": [
+      null,
+      {
+        "id": "song-recent-001",
+        "title": "Recent Song",
+        "diff": "MASTER",
+        "level": "14",
+        "const": 14.0,
+        "score": 987654,
+        "rating": 14.3,
+        "is_clear": true,
+        "is_fullcombo": false,
+        "is_alljustice": false,
+        "is_fullchain": false,
+        "is_const_unknown": false,
+        "is_played": true,
+        "genre": "POPS & ANIME",
+        "updated_at": "2026-08-29T02:30:00Z"
+      },
+      null, null, null, null, null, null, null, null
+    ]
+  },
+  "new": {
+    "value": 15.0,
+    "entries": [
+      {
+        "id": "song-new-001",
+        "title": "New Equivalent",
+        "diff": "ULTIMA",
+        "level": "15",
+        "const": 15.1,
+        "score": 976543,
+        "rating": 15.0,
+        "is_clear": false,
+        "is_fullcombo": false,
+        "is_alljustice": false,
+        "is_fullchain": false,
+        "is_const_unknown": false,
+        "is_played": true,
+        "genre": "ORIGINAL",
+        "updated_at": "2026-08-29T02:31:00Z"
+      }
+    ]
+  },
+  "best_candidate": {
+    "entries": [
+      {
+        "id": "song-candidate-001",
+        "title": "Candidate",
+        "diff": "MASTER",
+        "level": "14+",
+        "const": 14.9,
+        "score": 998000,
+        "rating": 15.4,
+        "is_clear": false,
+        "is_fullcombo": false,
+        "is_alljustice": false,
+        "is_fullchain": false,
+        "is_const_unknown": false,
+        "is_played": true,
+        "genre": "Original"
+      }
+    ]
+  },
+  "best_candidate_sss": {
+    "entries": [
+      {
+        "id": "song-candidate-sss-001",
+        "title": "Candidate SSS",
+        "diff": "MASTER",
+        "level": "14",
+        "const": 14.5,
+        "score": 1000000,
+        "rating": 15.2,
+        "is_clear": false,
+        "is_fullcombo": false,
+        "is_alljustice": false,
+        "is_fullchain": false,
+        "is_const_unknown": false,
+        "is_played": true,
+        "genre": "Original"
+      }
+    ]
+  },
+  "best_outside": {
+    "entries": [
+      null,
+      {
+        "id": "song-outside-001",
+        "title": "Outside",
+        "diff": "EXPERT",
+        "level": "13+",
+        "const": 13.7,
+        "score": 995000,
+        "rating": 14.8,
+        "is_clear": false,
+        "is_fullcombo": false,
+        "is_alljustice": false,
+        "is_fullchain": false,
+        "is_const_unknown": false,
+        "is_played": true,
+        "genre": "VARIETY"
+      }
+    ]
+  }
+}

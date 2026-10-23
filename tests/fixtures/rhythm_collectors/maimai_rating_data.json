@@ -1,0 +1,59 @@
+{
+  "playerName": "Fixture Maimai Player",
+  "rating": "14.32",
+  "updatedAt": "2026-08-29T04:00:00Z",
+  "best": {
+    "entries": [
+      {
+        "songId": "maimai-001",
+        "title": "Maimai Best",
+        "difficulty": "MASTER",
+        "chartType": "standard",
+        "level": "14+",
+        "chartConstant": 14.7,
+        "score": "1,005,000",
+        "achievement": "101.20%",
+        "dxScore": 2450,
+        "pScore": 3,
+        "rating": 14.82,
+        "clear": "CLEAR",
+        "fc": "FC",
+        "sync": "SYNC",
+        "fullBell": true,
+        "allBreak": false,
+        "genre": "POPS & ANIME",
+        "updatedAt": "2026-08-28T10:00:00+09:00"
+      }
+    ]
+  },
+  "recent": [
+    {
+      "music_id": "maimai-002",
+      "name": "Maimai Recent",
+      "diff": "EXPERT",
+      "type": "dx",
+      "level": "13",
+      "const": 13.2,
+      "score": 990000,
+      "achievement": 99.01,
+      "technical_score": 2100,
+      "p_score": 1,
+      "song_rating": 13.11,
+      "genre": "VARIETY",
+      "updated_at": "2026-08-29T03:30:00Z"
+    }
+  ],
+  "new": {
+    "entries": [
+      {
+        "id": "maimai-003",
+        "title": "Maimai New",
+        "difficulty": "ULTIMA",
+        "level": "15",
+        "score": 980000,
+        "rating": 14.1,
+        "genre": "ORIGINAL"
+      }
+    ]
+  }
+}

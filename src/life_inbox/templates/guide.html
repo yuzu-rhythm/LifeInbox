@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}使い方 | 生活マイページ{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">ローカル案内</p>
+    <h1>使い方</h1>
+    <p>Discord Botのコマンドと、このページで確認できる範囲をまとめています。</p>
+  </div>
+</div>
+
+<section class="guide-grid" aria-label="コマンド案内">
+  {% for section in sections %}
+  <article class="panel guide-card">
+    <p class="eyebrow">案内 {{ loop.index }}</p>
+    <h2>{{ section.title }}</h2>
+    <div class="guide-body">{{ section.body }}</div>
+  </article>
+  {% endfor %}
+</section>
+{% endblock %}

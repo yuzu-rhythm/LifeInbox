@@ -1,0 +1,18 @@
+<article id="routine-{{ routine.id }}" class="routine-row{{ ' routine-disabled' if not routine.enabled else '' }}">
+  <div class="routine-row-main">
+    <div class="routine-meta">
+      <span class="routine-time" aria-label="リマインダー時刻">{{ routine.reminder_time }}</span>
+      <span class="tag{{ ' tag-muted' if not routine.enabled else '' }}">{{ '有効' if routine.enabled else '停止中' }}</span>
+    </div>
+    <h3>{{ routine.title }}</h3>
+  </div>
+  <div class="routine-state">
+    {% if routine.completed_today %}
+    <span class="status-badge status-success">今日の完了済み</span>
+    {% elif routine.enabled %}
+    <span class="status-badge status-warning">今日の未完了</span>
+    {% else %}
+    <span class="status-badge status-neutral">無効</span>
+    {% endif %}
+  </div>
+</article>

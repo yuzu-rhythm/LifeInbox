@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}すぐ記録 | 生活マイページ{% endblock %}
+{% block content %}
+<div class="page-heading quick-heading">
+  <div>
+    <p class="eyebrow">Local capture</p>
+    <h1>すぐ記録</h1>
+    <p>思いついたことを一度受け止めるための、iPhoneとMacBook向けの入力欄です。種類は分類ヒントとして保存します。</p>
+  </div>
+  <div class="heading-total quick-heading-note"><span>保存先</span><strong>SQLite</strong><small>このMacの中だけ</small></div>
+</div>
+
+{% if quick_state %}
+<section class="state-message state-{{ quick_state.tone }} quick-result" role="status" aria-live="polite" aria-labelledby="quick-result-heading">
+  <div>
+    <strong id="quick-result-heading">{{ quick_state.title }}</strong>
+    <p>{{ quick_state.body }}</p>
+  </div>
+  {% if quick_state.event_id %}<a class="button-link" href="/events/{{ quick_state.event_id }}">保存内容を見る</a>{% endif %}
+</section>
+{% endif %}
+
+<section class="panel quick-panel" aria-labelledby="quick-form-heading">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">1. 種類を選ぶ</p>
+      <h2 id="quick-form-heading">何を残しますか？</h2>
+    </div>
+    <span class="section-count">分類はあとで変更できます</span>
+  </div>
+
+  <form method="post" action="/quick" class="quick-form" autocomplete="off">
+    <fieldset class="quick-type-fieldset">
+      <legend class="visually-hidden">記録の種類</legend>
+      <div class="quick-type-grid">
+        {% for key, label, description in quick_types %}
+        <label class="quick-chip">
+          <input type="radio" name="capture_type" value="{{ key }}"{% if key == quick_selected_type %} checked{% endif %}>
+          <span><strong>{{ label }}</strong><small>{{ description }}</small></span>
+        </label>
+        {% endfor %}
+      </div>
+    </fieldset>
+
+    <div class="quick-text-field">
+      <label for="quick-text"><span class="quick-step">2.</span> 内容</label>
+      <p id="quick-text-help" class="field-help">短くても大丈夫です。改行も保存されます。最大 {{ quick_max_length }} 文字。</p>
+      <textarea id="quick-text" name="text" rows="9" maxlength="{{ quick_max_length }}" required aria-describedby="quick-text-help" placeholder="例：来週の面接で聞きたいことを整理する"></textarea>
+      <div class="quick-form-footer">
+        <span class="field-help">外部サービス・Discord・AIは呼び出しません。</span>
+        <button type="submit">この内容を保存</button>
+      </div>
+    </div>
+    <input type="hidden" name="idempotency_token" value="{{ quick_token }}">
+  </form>
+</section>
+
+<section class="quick-contract" aria-labelledby="quick-contract-heading">
+  <div>
+    <p class="eyebrow">安全な境界</p>
+    <h2 id="quick-contract-heading">まず原文を保留保存します</h2>
+  </div>
+  <p>この画面は既存の InboxService の raw capture 経路だけを使います。支出・食事・タスク・音ゲー・就活の確定登録や外部連携は行わず、保存した原文は詳細画面から確認できます。確定分類や編集が必要なときは、既存のDiscordコマンドとBotのワークフローを使ってください。</p>
+</section>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}就活 | 生活マイページ{% endblock %}
+{% block content %}
+{% macro record_card(item) -%}
+<article class="career-record{% if item.is_terminal %} career-record-terminal{% endif %}">
+  <div class="career-record-heading">
+    <div class="career-badges">
+      <span class="tag">{{ item.kind_label }}</span>
+      <span class="status-badge status-{{ item.status_tone }}">{{ item.status_label }}</span>
+      {% if item.stage_label %}<span class="tag tag-muted">段階: {{ item.stage_label }}</span>{% endif %}
+      {% if item.is_terminal %}<span class="tag tag-muted">完了・終了</span>{% endif %}
+    </div>
+    <span class="career-record-type">{{ item.record_type_label }}</span>
+  </div>
+  <h3>{{ item.company }} <span aria-hidden="true">/</span> {{ item.title }}</h3>
+  <dl class="career-facts">
+    <div><dt>状態</dt><dd>{{ item.status_label }}</dd></div>
+    {% if item.stage_label %}<div><dt>応募段階</dt><dd>{{ item.stage_label }}</dd></div>{% endif %}
+    <div><dt>次の行動</dt><dd>{% if item.next_action %}{{ item.next_action }}{% if item.next_action_at_label %}<small>{{ item.next_action_at_label }}</small>{% endif %}{% else %}未設定{% endif %}</dd></div>
+    <div><dt>明示期限</dt><dd>{{ item.deadline_label or '未設定' }}</dd></div>
+  </dl>
+  <div class="career-record-footer">
+    {% if item.linked_task_id is not none %}<span class="career-task"><span>関連タスク</span><a href="/tasks#task-{{ item.linked_task_id }}">LifeTask #{{ item.linked_task_id }}</a><small>{{ item.linked_task_status_label }}</small></span>{% endif %}
+    {% if item.url %}<a class="career-link" href="{{ item.url }}" target="_blank" rel="noreferrer noopener">保存済みのURLを開く<span aria-hidden="true"> ↗</span></a>{% endif %}
+  </div>
+</article>
+{%- endmacro %}
+
+<div class="page-heading career-heading">
+  <div>
+    <p class="eyebrow">Career / local only</p>
+    <h1>就活の見通し</h1>
+    <p>会社・求人・イベントと応募の進み具合を、ローカルSQLiteから表示専用で確認できます。時刻は {{ timezone_name }} で表示しています。</p>
+  </div>
+  <div class="heading-total"><span>活動中</span><strong>{{ career_active_count }}件</strong><small>応募・保存中の記録</small></div>
+</div>
+
+<p class="career-note" role="note">
+  新しい記録は Discord の <strong>#なんでも入力</strong> に投稿するか、<code>/就活追加</code>・<code>/就活更新</code>・<code>/就活一覧</code> を使ってください。このWebページからの変更操作はありません。
+</p>
+
+{% if not career_available %}
+<p class="state-message state-warning" role="status">就活テーブルを読み込めませんでした。Botのデータ初期化後に再表示してください。</p>
+{% endif %}
+
+<section class="panel career-upcoming-panel" aria-labelledby="career-upcoming-heading">
+  <div class="section-heading"><div><p class="eyebrow">次に確認</p><h2 id="career-upcoming-heading">期限・次の行動</h2></div><span class="section-count">{{ upcoming_career|length }}件</span></div>
+  <p class="career-section-note">保存されている明示的な期限と次の行動を、近い順に並べています。</p>
+  {% if upcoming_career %}
+  <ol class="career-upcoming-list">
+    {% for item in upcoming_career %}
+    <li class="career-upcoming-item{% if item.is_overdue %} career-upcoming-overdue{% endif %}">
+      <div class="career-upcoming-date"><span>{{ item.upcoming_focus_label }}</span><strong>{{ item.upcoming_at_label }}</strong>{% if item.is_overdue %}<small>期限超過</small>{% endif %}</div>
+      <div class="career-upcoming-main">
+        <div class="career-badges"><span class="tag">{{ item.kind_label }}</span><span class="status-badge status-{{ item.status_tone }}">{{ item.status_label }}</span>{% if item.stage_label %}<span class="tag tag-muted">{{ item.stage_label }}</span>{% endif %}</div>
+        <h3>{{ item.company }} <span aria-hidden="true">/</span> {{ item.title }}</h3>
+        {% if item.next_action %}<p>次の行動: {{ item.next_action }}</p>{% endif %}
+        <div class="career-upcoming-meta">{% if item.deadline_label %}<span>明示期限 {{ item.deadline_label }}</span>{% endif %}{% if item.next_action_at_label %}<span>行動日時 {{ item.next_action_at_label }}</span>{% endif %}{% if item.linked_task_id is not none %}<a href="/tasks#task-{{ item.linked_task_id }}">LifeTask #{{ item.linked_task_id }}・{{ item.linked_task_status_label }}</a>{% endif %}</div>
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <p class="empty">明示的な期限や次の行動はまだありません。</p>
+  {% endif %}
+</section>
+
+<div class="career-columns">
+  <section class="panel career-section" aria-labelledby="career-applications-heading">
+    <div class="section-heading"><div><p class="eyebrow">Applications</p><h2 id="career-applications-heading">応募中</h2></div><span class="section-count">{{ active_applications|length }}件</span></div>
+    <p class="career-section-note">応募段階と現在の状態をまとめています。</p>
+    <div class="career-record-list">{% for item in active_applications %}{{ record_card(item) }}{% else %}<div class="empty-block"><h3>応募中の記録はありません</h3><p>応募を登録すると、段階・状態・期限をここで確認できます。</p></div>{% endfor %}</div>
+  </section>
+
+  <section class="panel career-section" aria-labelledby="career-opportunities-heading">
+    <div class="section-heading"><div><p class="eyebrow">Saved / Interested</p><h2 id="career-opportunities-heading">保存・興味あり</h2></div><span class="section-count">{{ saved_opportunities|length }}件</span></div>
+    <p class="career-section-note">企業・求人・イベントの候補をまとめています。</p>
+    <div class="career-record-list">{% for item in saved_opportunities %}{{ record_card(item) }}{% else %}<div class="empty-block"><h3>保存中の企業・求人・イベントはありません</h3><p>気になる候補を登録すると、ここに並びます。</p></div>{% endfor %}</div>
+  </section>
+</div>
+
+{% if terminal_career %}
+<section class="panel career-terminal-panel" aria-labelledby="career-terminal-heading">
+  <div class="section-heading"><div><p class="eyebrow">Completed / Terminal</p><h2 id="career-terminal-heading">完了・終了した記録</h2></div><span class="section-count">{{ terminal_career|length }}件</span></div>
+  <p class="career-section-note">完了・不採用・辞退・アーカイブ済みの記録は、確認用に控えめに表示しています。</p>
+  <div class="career-record-list">{% for item in terminal_career %}{{ record_card(item) }}{% endfor %}</div>
+</section>
+{% endif %}
+{% endblock %}

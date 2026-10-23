@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}音ゲー | 生活マイページ{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">成長ログ</p>
+    <h1>音ゲーTODOとリザルト</h1>
+    <p>ローカルに保存されたTODO・リザルト・レート取得状態を、機種ごとに確認できます。</p>
+  </div>
+  <div class="heading-total"><span>未完了</span><strong>{{ todos|length }}件</strong><small>リザルト {{ results|length }}件</small></div>
+</div>
+
+<section class="panel rhythm-collection-panel" aria-labelledby="collection-status-heading">
+  <div class="section-heading"><div><p class="eyebrow">iPhone / Bot 共通の保存状態</p><h2 id="collection-status-heading">機種別レートと取得状況</h2></div><span class="section-count">履歴は直近12件</span></div>
+  <p class="rhythm-safety-note">表示するのはSQLiteに保存された正規化レートと、リンクが確認できたPNGだけです。providerのHTML、Cookie、トークン、認証情報は表示しません。</p>
+  {% if not rhythm_status_available %}<p class="state-message state-warning" role="status">レート収集テーブルを読み込めませんでした。既存のTODO・リザルトは下に表示しています。</p>{% endif %}
+  <div class="rhythm-status-grid rhythm-status-grid-detail">
+    {% for rhythm_status in rhythm_statuses %}{% set show_history = true %}{% include "partials/rhythm_status_card.html" %}{% endfor %}
+  </div>
+</section>
+
+<section class="panel today-progress-panel" aria-labelledby="today-progress-heading">
+  <div class="section-heading"><div><p class="eyebrow">{{ timezone_name }}</p><h2 id="today-progress-heading">今日の進捗</h2></div><span class="section-count">{{ today_results|length }}件</span></div>
+  <div class="today-result-list">
+    {% for item in today_results %}
+    <article class="today-result-card">
+      <div class="today-result-heading"><div><span class="tag">{{ item.game_label }}</span><h3>{{ item.note or 'リザルト画像' }}</h3>{% if item.todo_title %}<p>達成: {{ item.todo_title }}</p>{% endif %}</div><time>{{ item.occurred_label }}</time></div>
+      <div class="today-images">
+        {% for attachment_id in item.attachment_ids %}<a href="/attachments/{{ attachment_id }}" target="_blank" rel="noreferrer noopener"><img src="/attachments/{{ attachment_id }}" alt="{{ item.game_label }}の今日の進捗" loading="lazy"></a>{% else %}<p class="empty compact">画像は保存されていません。</p>{% endfor %}
+      </div>
+    </article>
+    {% else %}<p class="empty">今日のリザルトはまだありません。Discordの進捗チャンネルに画像を投稿すると、ここに表示されます。</p>{% endfor %}
+  </div>
+</section>
+
+<section class="game-columns" aria-label="音ゲーTODO">
+  {% for game in games %}
+  <article class="panel">
+    <div class="game-title"><span class="game-logo {{ game.key }}" aria-hidden="true">{{ game.short }}</span><div><h2>{{ game.label }}</h2><small>未完了 {{ game.todos|length }}件</small></div></div>
+    <div class="todo-list">{% for item in game.todos %}<div><span>#{{ item.id }}</span><p>{{ item.title }}</p><time>{{ item.occurred_label }}</time></div>{% else %}<p class="empty compact">未完了TODOはありません。</p>{% endfor %}</div>
+  </article>
+  {% endfor %}
+</section>
+
+<section class="favorite-columns" aria-label="maimaiの保存スナップショット">
+  <article class="panel snapshot-panel">
+    <div class="section-heading"><div><p class="eyebrow">ローカル入力</p><h2>手動お気に入り</h2></div><span class="section-count">{{ manual_favorites|length }}件</span></div>
+    <p class="snapshot-note">Discordの <code>/favorite_add</code> で登録した、ユーザー作成の一覧です。</p>
+    <div class="snapshot-list">{% for item in manual_favorites %}<div><strong>{{ item.song_title }}</strong>{% if item.note %}<small>{{ item.note }}</small>{% endif %}</div>{% else %}<p class="empty compact">手動お気に入りはまだありません。</p>{% endfor %}</div>
+  </article>
+
+  <article class="panel snapshot-panel">
+    <div class="section-heading"><div><p class="eyebrow">公式 maimai でらっくすNET</p><h2>公式NETお気に入り</h2></div><span class="section-count">{{ net_favorites|length }}件</span></div>
+    {% if net_favorites_fetched_at %}<p class="snapshot-note">取得日時: {{ net_favorites_fetched_at }}（{{ timezone_name }}）。サニタイズ済みJSONのローカル取込データです。自動同期ではありません。</p>{% else %}<p class="snapshot-note">サニタイズ済みJSONのローカル取込データです。自動同期ではありません。</p>{% endif %}
+    <div class="snapshot-table"><table><thead><tr><th>順位</th><th>曲名 / アーティスト</th><th>カテゴリ</th></tr></thead><tbody>{% for item in net_favorites %}<tr><td class="num">{{ item.rank }}</td><td><strong>{{ item.title }}</strong><small>{{ item.artist }}</small></td><td>{{ item.category }}</td></tr>{% else %}<tr><td colspan="3" class="empty">公式NETお気に入りはまだありません。</td></tr>{% endfor %}</tbody></table></div>
+  </article>
+
+  <article class="panel snapshot-panel">
+    <div class="section-heading"><div><p class="eyebrow">プレイ回数順</p><h2>MY BEST</h2></div><span class="section-count">{{ my_best|length }}曲</span></div>
+    {% if my_best_fetched_at %}<p class="snapshot-note">取得日時: {{ my_best_fetched_at }}（{{ timezone_name }}）。サニタイズ済みJSONのローカル取込データです。自動同期ではありません。</p>{% else %}<p class="snapshot-note">公式NETのプレイ回数順スナップショットです。お気に入りとは別です。</p>{% endif %}
+    <div class="snapshot-table"><table><thead><tr><th>順位</th><th>曲名</th><th class="num">プレイ回数</th></tr></thead><tbody>{% for item in my_best %}<tr><td class="num">{{ item.rank }}</td><td><strong>{{ item.title }}</strong></td><td class="num">{{ item.play_count }}回</td></tr>{% else %}<tr><td colspan="3" class="empty">MY BESTはまだありません。</td></tr>{% endfor %}</tbody></table></div>
+  </article>
+</section>
+
+<section class="panel" aria-labelledby="result-history-heading">
+  <div class="section-heading"><div><p class="eyebrow">結果</p><h2 id="result-history-heading">リザルト履歴</h2></div><span class="section-count">{{ results|length }}件</span></div>
+  <div class="result-grid">
+    {% for item in results %}
+    <article class="result-card">
+      {% if item.attachment_id %}<a href="/attachments/{{ item.attachment_id }}" target="_blank" rel="noreferrer noopener"><img src="/attachments/{{ item.attachment_id }}" alt="{{ item.game_label }}リザルト" loading="lazy"></a>{% else %}<div class="result-placeholder" role="img" aria-label="画像なし">RESULT</div>{% endif %}
+      <div><span class="tag">{{ item.game_label }}</span><h3>{{ item.note or 'リザルト記録' }}</h3>{% if item.todo_title %}<p>達成: {{ item.todo_title }}</p>{% endif %}<time>{{ item.occurred_label }}</time></div>
+    </article>
+    {% else %}<p class="empty">リザルトはまだありません。</p>{% endfor %}
+  </div>
+</section>
+{% endblock %}

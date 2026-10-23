@@ -1,0 +1,26 @@
+{
+  "officialNet": "fixture",
+  "playerName": "Fixture Ongeki Player",
+  "rating": 13.75,
+  "scoreLog": {
+    "updatedAt": "2026-08-29T05:00:00Z",
+    "entries": [
+      {
+        "song_id": "ongeki-001",
+        "title": "Ongeki ScoreLog Song",
+        "difficulty": "MASTER",
+        "chart_type": "standard",
+        "level": "14",
+        "chart_constant": 14.0,
+        "score": 1000000,
+        "achievement": 100.5,
+        "technical_score": 1820,
+        "p_score": 2,
+        "song_rating": 13.75,
+        "clear_status": "CLEAR",
+        "genre": "ORIGINAL",
+        "updated_at": "2026-08-29T04:55:00Z"
+      }
+    ]
+  }
+}

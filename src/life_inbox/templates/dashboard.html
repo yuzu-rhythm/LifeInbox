@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}概要 | 生活マイページ{% endblock %}
+{% block content %}
+<section class="hero dashboard-hero" aria-labelledby="dashboard-heading">
+  <div>
+    <p class="eyebrow">{{ today_label }}・ローカルSQLite</p>
+    <h1 id="dashboard-heading">今日の暮らしを、ひと目で。</h1>
+    <p>Discordへ投げた確定記録と、今日やることをこのMacの中で静かに確認できます。</p>
+    <a class="hero-quick-link" href="/quick"><strong>＋ すぐ記録</strong><span>思いついたことを原文のまま残す</span></a>
+  </div>
+  <div class="hero-totals">
+    <div class="hero-total"><span>今日の確定支出</span><strong>{{ "{:,}".format(today_total) }}円</strong><small>{{ today_transaction_count }}件・支出一覧へ</small></div>
+    <div class="hero-total month-total"><span>{{ month_label }}の確定支出</span><strong>{{ "{:,}".format(month_total) }}円</strong><small>{{ month_transaction_count }}件</small></div>
+  </div>
+</section>
+
+<section class="metric-grid dashboard-metrics" aria-label="生活の概要">
+  <a class="metric card" href="/tasks#open-tasks-heading">
+    <span>未完了タスク</span><strong>{{ task_open_count }}件</strong><small>{{ task_overdue_count }}件が期限超過</small>
+  </a>
+  <a class="metric card{{ ' metric-alert' if task_overdue_count else '' }}" href="/tasks#open-tasks-heading">
+    <span>期限超過</span><strong>{{ task_overdue_count }}件</strong><small>先に確認する</small>
+  </a>
+  <a class="metric card" href="/tasks#routines-heading">
+    <span>今日の日課</span><strong>{{ routine_completed_count }}/{{ routines|length }}</strong><small>完了済み・一覧へ</small>
+  </a>
+  <a class="metric card" href="/rhythm#collection-status-heading">
+    <span>音ゲーTODO</span><strong>{{ open_rhythm_count }}件</strong><small>maimai・オンゲキ・チュウニズム</small>
+  </a>
+  <a class="metric card career-metric" href="/career">
+    <span>就活</span><strong>{{ career_active_count }}件</strong>
+    {% if career_next_item %}<small>{% if career_next_item.upcoming_focus_label == '次の行動' and career_next_item.next_action %}{{ career_next_item.next_action }}{% else %}{{ career_next_item.upcoming_focus_label }}{% endif %}・{{ career_next_item.upcoming_at_label }}・{{ career_next_item.company }}</small>
+    {% else %}<small>次の期限・行動はありません</small>{% endif %}
+  </a>
+  <a class="metric card" href="/transactions?dining=1">
+    <span>外食</span><strong>{{ "{:,}".format(dining_total) }}円</strong><small>{{ dining_count }}回・専用表示へ</small>
+  </a>
+  <a class="metric card" href="/transactions?minimum=5000">
+    <span>目立った出費</span><strong>{{ notable_count }}件</strong><small>5,000円以上</small>
+  </a>
+  <a class="metric card" href="/meals">
+    <span>今月の食事</span><strong>{{ meal_count }}件</strong><small>写真・外食／自炊を確認</small>
+  </a>
+  <a class="metric card" href="/budgets">
+    <span>今月の予算</span>
+    {% if budget_overall %}
+      {% if budget_overall.remaining >= 0 %}<strong>{{ "{:,}".format(budget_overall.remaining) }}円</strong><small>残り・上限 {{ "{:,}".format(budget_overall.amount) }}円</small>
+      {% else %}<strong class="over-budget">超過 {{ "{:,}".format(-budget_overall.remaining) }}円</strong><small>上限 {{ "{:,}".format(budget_overall.amount) }}円</small>{% endif %}
+    {% else %}
+      <strong>未設定</strong><small>予算を確認・設定する</small>
+    {% endif %}
+  </a>
+</section>
+
+<div class="dashboard-grid">
+  <section class="panel" aria-labelledby="task-overview-heading">
+    <div class="section-heading"><div><p class="eyebrow">次にやること</p><h2 id="task-overview-heading">タスクの見通し</h2></div><a href="/tasks">詳細</a></div>
+    {% if overdue_tasks %}
+    <div class="task-overview-block"><h3>期限超過 <span class="section-count">{{ overdue_tasks|length }}件</span></h3>{% for task in overdue_tasks[:3] %}<a class="overview-row overview-row-alert" href="/tasks#task-{{ task.id }}"><span>{{ task.title }}</span><small>期限 {{ task.due_label }}</small></a>{% endfor %}</div>
+    {% endif %}
+    {% if due_today_tasks %}
+    <div class="task-overview-block"><h3>今日が期限 <span class="section-count">{{ due_today_tasks|length }}件</span></h3>{% for task in due_today_tasks[:3] %}<a class="overview-row" href="/tasks#task-{{ task.id }}"><span>{{ task.title }}</span><small>{{ task.source_label }}</small></a>{% endfor %}</div>
+    {% endif %}
+    {% if upcoming_tasks %}
+    <div class="task-overview-block"><h3>これから <span class="section-count">{{ upcoming_tasks|length }}件</span></h3>{% for task in upcoming_tasks[:3] %}<a class="overview-row" href="/tasks#task-{{ task.id }}"><span>{{ task.title }}</span><small>期限 {{ task.due_label }}</small></a>{% endfor %}</div>
+    {% endif %}
+    {% if not open_tasks %}<p class="empty">未完了のタスクはありません。</p>{% elif not overdue_tasks and not due_today_tasks and not upcoming_tasks %}<p class="empty">期限のないタスクがあります。詳細で確認できます。</p>{% endif %}
+  </section>
+
+  <section class="panel" aria-labelledby="routines-heading">
+    <div class="section-heading"><div><p class="eyebrow">毎日のリズム</p><h2 id="routines-heading">今日の日課</h2></div><a href="/tasks#routines-heading">一覧</a></div>
+    {% if not routines_available %}
+    <p class="state-message state-warning" role="status">日課テーブルを読み込めませんでした。Botのデータ初期化後に再表示してください。</p>
+    {% elif routines %}
+    <div class="routine-list">{% for routine in routines[:5] %}{% include "partials/routine_row.html" %}{% endfor %}</div>
+    <p class="panel-footnote">{{ routine_completed_count }}件完了 / {{ routines|length }}件・時刻は設定タイムゾーンで表示</p>
+    {% else %}<p class="empty">日課はまだありません。Discordの <code>/日課追加</code> から登録できます。</p>{% endif %}
+  </section>
+</div>
+
+<div class="two-column">
+  <section class="panel" aria-labelledby="category-heading">
+    <div class="section-heading"><div><p class="eyebrow">{{ month_label }}の支出</p><h2 id="category-heading">カテゴリ別</h2></div><a href="/transactions">すべて見る</a></div>
+    {% if category_totals %}
+      <div class="category-list">
+      {% for item in category_totals %}
+        <a href="/transactions?category={{ item.name|urlencode }}"><span>{{ item.name }}</span><span class="bar" aria-hidden="true"><i style="width: {{ item.percent }}%"></i></span><strong>{{ "{:,}".format(item.total) }}円</strong></a>
+      {% endfor %}
+      </div>
+    {% else %}<p class="empty">今月の確定支出はまだありません。</p>{% endif %}
+  </section>
+
+  <section class="panel" aria-labelledby="accounts-heading">
+    <div class="section-heading"><div><p class="eyebrow">資産と負債</p><h2 id="accounts-heading">口座・カード・NISA</h2></div><a href="/accounts">詳細</a></div>
+    {% if account_summaries %}
+    <div class="account-summary-list">
+      {% for item in account_summaries %}
+      <a class="account-summary-row" href="/accounts"><span><i class="account-dot {{ item.kind }}" aria-hidden="true"></i><strong>{{ item.label }}</strong><small>{{ item.count }}件{% if item.is_debt %}・利用残高{% endif %}</small></span><b class="{{ 'debt' if item.is_debt else '' }}">{{ item.balance_label }}</b></a>
+      {% endfor %}
+    </div>
+    {% else %}<p class="empty">口座はまだ登録されていません。</p>{% endif %}
+    {% if account_balances %}<p class="panel-footnote">内訳は <a href="/accounts">口座一覧</a> で確認できます。</p>{% endif %}
+  </section>
+</div>
+
+<section class="panel dashboard-rhythm-panel" aria-labelledby="collection-status-heading">
+  <div class="section-heading"><div><p class="eyebrow">取得状況・レート</p><h2 id="collection-status-heading">音ゲーの現在地</h2></div><a href="/rhythm">履歴と画像</a></div>
+  {% if not rhythm_status_available %}<p class="state-message state-warning" role="status">音ゲー収集データを読み込めませんでした。保存済みのTODOとリザルトは音ゲーページで確認できます。</p>{% endif %}
+  <div class="rhythm-status-grid">{% for rhythm_status in rhythm_statuses %}{% set show_history = false %}{% include "partials/rhythm_status_card.html" %}{% endfor %}</div>
+</section>
+
+<div class="two-column">
+  <section class="panel" aria-labelledby="recent-records-heading">
+    <div class="section-heading"><div><p class="eyebrow">最近</p><h2 id="recent-records-heading">確定した支出</h2></div><a href="/transactions">支出一覧</a></div>
+    {% if recent_events %}
+      <div class="timeline">
+      {% for item in recent_events[:6] %}<a href="/events/{{ item.id }}"><time>{{ item.occurred_label }}</time><span><strong>{{ item.title }}</strong><small>{{ item.category }}{% if item.account_name %}・{{ item.account_name }}{% endif %}</small></span><b>{{ item.amount_label }}</b></a>{% endfor %}
+      </div>
+    {% else %}<p class="empty">確定済みの支出はまだありません。</p>{% endif %}
+  </section>
+
+  <section class="panel" aria-labelledby="recent-memos-heading">
+    <div class="section-heading"><div><p class="eyebrow">ひとこと</p><h2 id="recent-memos-heading">最近のメモ</h2></div><a href="/memos">すべて見る</a></div>
+    {% if recent_memos %}
+      <div class="memo-list">{% for memo in recent_memos %}<article><a href="/events/{{ memo.event_id }}"><p>{{ memo.body }}</p><time>{{ memo.occurred_label }}・記録 #{{ memo.event_id }}</time></a></article>{% endfor %}</div>
+    {% else %}<p class="empty">#一言メモへの投稿がここに並びます。</p>{% endif %}
+  </section>
+</div>
+
+<section class="panel" aria-labelledby="recent-meals-heading">
+  <div class="section-heading"><div><p class="eyebrow">食事の記録</p><h2 id="recent-meals-heading">最近食べたもの</h2></div><a href="/meals">食事一覧</a></div>
+  {% if recent_meals %}
+  <div class="recent-meal-list">{% for meal in recent_meals %}<a class="recent-meal-row" href="/events/{{ meal.event_id }}">{% if meal.attachment_id %}<img src="/attachments/{{ meal.attachment_id }}" alt="" loading="lazy">{% else %}<span class="meal-icon" aria-hidden="true">{{ meal.meal_icon }}</span>{% endif %}<span><strong>{{ meal.title }}</strong><small>{{ meal.meal_type_label }}・{{ meal.outside_label }}・{{ meal.occurred_label }}</small></span></a>{% endfor %}</div>
+  {% else %}<p class="empty">食事記録はまだありません。</p>{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.life-inbox.backup</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>__ABS_PYTHON_BIN__</string>
+		<string>-m</string>
+		<string>life_inbox</string>
+		<string>backup</string>
+	</array>
+	<key>WorkingDirectory</key>
+	<string>__ABS_PROJECT_DIR__</string>
+	<key>Comment</key>
+	<string>Default output is __ABS_PROJECT_DIR__/data/backups unless DATA_DIR is explicitly configured.</string>
+	<key>RunAtLoad</key>
+	<false/>
+	<!-- The backup runs from StartCalendarInterval; do not keep it alive between runs. -->
+	<key>KeepAlive</key>
+	<false/>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>3</integer>
+		<key>Minute</key>
+		<integer>15</integer>
+	</dict>
+	<key>ThrottleInterval</key>
+	<integer>3600</integer>
+	<key>ProcessType</key>
+	<string>Background</string>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PYTHONUNBUFFERED</key>
+		<string>1</string>
+	</dict>
+	<key>StandardOutPath</key>
+	<string>__ABS_LOG_DIR__/backup.stdout.log</string>
+	<key>StandardErrorPath</key>
+	<string>__ABS_LOG_DIR__/backup.stderr.log</string>
+</dict>
+</plist>

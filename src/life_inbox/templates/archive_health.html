@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}同期ヘルス | Life Archive{% endblock %}
+
+{% block content %}
+<div class="page-heading archive-heading">
+  <div>
+    <p class="eyebrow">SYNC HEALTH</p>
+    <h1>同期ヘルス</h1>
+    <p>外部サービスへ接続せず、ローカルSQLiteと生成物から確認できる状態だけを表示します。</p>
+  </div>
+  <div class="heading-total">
+    <span>最終同期</span>
+    <strong>{{ health.last_sync }}</strong>
+    <small>未確認の値は未確認のまま表示</small>
+  </div>
+</div>
+
+<div class="metric-grid archive-health-metrics">
+  <div class="metric card"><span>schema</span><strong>v{{ health.schema.version }}</strong><small>{{ health.schema.state }} / {{ health.schema.tables }}</small></div>
+  <div class="metric card"><span>添付</span><strong>{{ health.attachments.total }}件</strong><small>隔離 {{ health.attachments.quarantined }}件</small></div>
+  <div class="metric card"><span>ダウンロード失敗</span><strong>{{ health.attachments.download_failed }}件</strong><small>再試行可能なローカル状態</small></div>
+  <div class="metric card"><span>公開待ち</span><strong>{{ health.publication_pending }}件</strong><small>公開処理はP0未実装</small></div>
+</div>
+
+<div class="two-column archive-health-columns">
+  <section class="panel" aria-labelledby="archive-status-heading">
+    <div class="section-heading">
+      <div><p class="eyebrow">STATES</p><h2 id="archive-status-heading">同期状態件数</h2></div>
+      <a href="/archive">タイムライン</a>
+    </div>
+    <div class="archive-health-state-list">
+      {% for status, count in health.status_counts.items() %}
+      <div><span>{{ status }}</span><strong>{{ count }}</strong></div>
+      {% endfor %}
+    </div>
+    <p class="panel-footnote">削除待ち: {{ health.deletion_pending }}件。tombstoneはタイムラインへ表示しません。</p>
+  </section>
+
+  <section class="panel" aria-labelledby="archive-artifact-heading">
+    <div class="section-heading">
+      <div><p class="eyebrow">ARTIFACTS</p><h2 id="archive-artifact-heading">バックアップ・エクスポート</h2></div>
+    </div>
+    <dl class="details archive-health-details">
+      <div><dt>ローカルbackup</dt><dd>{{ health.backup.state }}{% if health.backup.latest %}（{{ health.backup.latest }} / {{ health.backup.count }}件）{% endif %}</dd></div>
+      <div><dt>完全export</dt><dd>{{ health.export.state }}{% if health.export.latest %}（{{ health.export.latest }} / {{ health.export.count }}件）{% endif %}</dd></div>
+      <div><dt>外部backup</dt><dd>{{ health.external_backup }}</dd></div>
+      <div><dt>schema状態</dt><dd>{{ health.schema.state }} / {{ health.schema.tables }}</dd></div>
+    </dl>
+    <p class="panel-footnote">生成成功は外部バックアップ成功を意味しません。</p>
+  </section>
+</div>
+{% endblock %}

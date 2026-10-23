@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}口座 | 生活マイページ{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">複数口座・カード・NISA</p>
+    <h1>お金の置き場所</h1>
+    <p>カードの正数は利用残高（負債）、それ以外の正数は保有残高です。金額は確定済みの入出金と振替から計算しています。</p>
+  </div>
+</div>
+
+<section class="account-cards" aria-label="口座残高">
+  {% for item in accounts %}
+  <article class="card account-card">
+    <div><i class="account-dot {{ item.kind }}" aria-hidden="true"></i><span>{{ item.kind_label }}</span>{% if not item.active %}<span class="tag tag-muted">停止中</span>{% endif %}</div>
+    <h2>{{ item.name }}</h2>
+    <strong class="{{ 'debt' if item.is_debt else '' }}">{{ "{:,}".format(item.balance) }}円</strong>
+    <small>開始残高 {{ "{:,}".format(item.opening_balance) }}円</small>
+  </article>
+  {% else %}<p class="empty">口座がありません。</p>{% endfor %}
+</section>
+
+<section class="panel table-panel" aria-labelledby="account-activity-heading">
+  <div class="section-heading"><div><p class="eyebrow">履歴</p><h2 id="account-activity-heading">入出金・振替</h2></div></div>
+  {% if activities %}
+  <table>
+    <thead><tr><th>日時</th><th>種類</th><th>内容</th><th>移動</th><th class="num">金額</th></tr></thead>
+    <tbody>{% for item in activities %}<tr><td>{{ item.occurred_label }}</td><td><span class="tag">{{ item.kind_label }}</span></td><td>{{ item.description or '—' }}</td><td>{{ item.route_label }}</td><td class="num"><strong>{{ item.amount_label }}</strong></td></tr>{% endfor %}</tbody>
+  </table>
+  {% else %}<p class="empty">口座に紐づいた履歴はありません。</p>{% endif %}
+</section>
+{% endblock %}

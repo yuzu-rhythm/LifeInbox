@@ -1,0 +1,71 @@
+{
+  "profile": {
+    "name": "Fixture Generator Player",
+    "rating": 16.45,
+    "is_premium": true,
+    "best_avg": 16.2,
+    "new_avg": 16.1,
+    "pscore_avg": 16.0
+  },
+  "rating": {
+    "best": [
+      {
+        "id": 123,
+        "title": "Generator Best",
+        "artist": "Fixture Artist",
+        "diff": "MAS",
+        "level": 14.5,
+        "const": 14.5,
+        "score": 1009000,
+        "rating": 16.2,
+        "rank": "SSS+",
+        "update": "2026-08-30",
+        "lamps": {
+          "is_fullcombo": true,
+          "is_allbreak": false,
+          "is_fullbell": true
+        }
+      }
+    ],
+    "new": [
+      {
+        "id": 456,
+        "title": "Generator New",
+        "artist": "Fixture Artist",
+        "diff": "EXP",
+        "level": 13,
+        "const": 13.2,
+        "score": 990000,
+        "rating": 15.8,
+        "rank": "SS",
+        "update": "2026-08-30",
+        "lamps": {
+          "is_fullcombo": false,
+          "is_allbreak": false,
+          "is_fullbell": false
+        }
+      }
+    ],
+    "pscore": [
+      {
+        "id": 789,
+        "title": "Generator P-Score",
+        "artist": "Fixture Artist",
+        "diff": "LUN",
+        "level": 15,
+        "const": 15.0,
+        "score": 1010000,
+        "p_score": 12345,
+        "p_rating": 16.1,
+        "rank": "SSS+",
+        "update": "2026-08-30",
+        "lamps": {
+          "is_fullcombo": false,
+          "is_allbreak": false,
+          "is_fullbell": false
+        }
+      }
+    ]
+  },
+  "record": []
+}

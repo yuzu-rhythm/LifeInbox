@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}SNS下書き | 生活マイページ{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">ローカル outbox</p>
+    <h1>SNS下書き</h1>
+    <p>X・Instagram・両方・保留の選択を、Eventごとのローカル下書きとして確認します。ここから外部SNSへ投稿することはありません。</p>
+  </div>
+  <div class="heading-total"><span>下書き</span><strong>{{ social_drafts|length }}件</strong><small>候補 {{ social_ready_count }}件 / ブロック {{ social_blocked_count }}件</small></div>
+</div>
+
+<section class="state-message state-warning" role="status">
+  <strong>外部SNSには投稿していません。</strong>
+  <span>Discordで対象を選ぶと、選択先と状態だけがローカルSQLiteのoutboxに保存されます。現在保存できるメディアは画像（JPEG・PNG・WebP・GIF）のみで、動画の捕捉・保存は未対応です。Instagram／両方は保存済み画像がないとブロックされます。</span>
+</section>
+
+<section class="social-list" aria-label="SNS下書き一覧">
+  {% for item in social_drafts %}
+  <article class="panel social-draft-card">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Event #{{ item.event_id }}</p>
+        <h2>{{ item.target_label }}</h2>
+      </div>
+      <span class="status-badge status-{{ item.state_tone }}">{{ item.state_label }}</span>
+    </div>
+
+    <p class="social-draft-not-posted"><strong>外部投稿:</strong> 未実施（このアプリは外部SNSへ投稿しません）</p>
+    <dl class="details">
+      <div><dt>原文</dt><dd class="raw">{{ item.raw_text or '（なし）' }}</dd></div>
+      <div><dt>対象</dt><dd>{{ item.target_label }}</dd></div>
+      <div><dt>状態</dt><dd>{{ item.state_label }}</dd></div>
+      <div><dt>保存日時</dt><dd>{{ item.created_label }}</dd></div>
+      <div><dt>更新日時</dt><dd>{{ item.updated_label }}</dd></div>
+      <div><dt>選択日時</dt><dd>{{ item.selected_label }}</dd></div>
+      <div><dt>公開日時</dt><dd>{{ item.published_label }}</dd></div>
+      {% if item.error_label %}<div><dt>エラー</dt><dd>{{ item.error_label }}</dd></div>{% endif %}
+    </dl>
+
+    {% if item.media %}
+    <div class="image-grid social-media-grid" aria-label="保存済み画像">
+      {% for media in item.media %}
+      <figure>
+        <a href="/attachments/{{ media.id }}" target="_blank" rel="noreferrer noopener">
+          <img src="/attachments/{{ media.id }}" alt="{{ media.filename }}" loading="lazy">
+        </a>
+        <figcaption>{{ media.filename }}（{{ media.content_type }}）</figcaption>
+      </figure>
+      {% endfor %}
+    </div>
+    {% elif item.has_media %}
+    <p class="empty-block">保存済みメディアはありますが、安全に表示できる画像ファイルを確認できません。</p>
+    {% else %}
+    <p class="empty-block">保存済み画像はありません。Instagram／両方の選択はブロックされます。動画の捕捉・保存は現在未対応です。</p>
+    {% endif %}
+
+    <p class="panel-footnote"><a href="/events/{{ item.event_id }}">元のEvent #{{ item.event_id }}を見る</a></p>
+  </article>
+  {% else %}
+  <p class="empty">#毎日の投稿または #なんでも入力からSNS下書きを作ると、ここに表示されます。</p>
+  {% endfor %}
+</section>
+{% endblock %}

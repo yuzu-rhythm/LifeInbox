@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}タスク・日課 | 生活マイページ{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div>
+    <p class="eyebrow">生活タスクと日課</p>
+    <h1>やること</h1>
+    <p>期限のあるタスクと、毎日の完了状態をローカルSQLiteから読み取ります。ここからの変更操作はありません。</p>
+  </div>
+  <div class="heading-total"><span>未完了</span><strong>{{ open_count }}件</strong><small>期限超過 {{ overdue_count }}件</small></div>
+</div>
+
+<section class="metric-grid task-metrics" aria-label="タスクと日課の集計">
+  <article class="metric"><span>未完了</span><strong>{{ open_count }}件</strong><small>これからやること</small></article>
+  <article class="metric{{ ' metric-alert' if overdue_count else '' }}"><span>期限超過</span><strong>{{ overdue_count }}件</strong><small>未完了のうち期限を過ぎたもの</small></article>
+  <article class="metric"><span>今日が期限</span><strong>{{ due_today_tasks|length }}件</strong><small>今日確認するタスク</small></article>
+  <article class="metric"><span>完了済み</span><strong>{{ completed_count }}件</strong><small>完了したタスク</small></article>
+  <article class="metric"><span>今日の日課</span><strong>{{ routine_completed_count }}/{{ routines|length }}</strong><small>完了済み</small></article>
+</section>
+
+<p class="task-note" role="note">
+  Google Classroom / Notion はまだ接続していません。この画面はローカルSQLiteに保存されたタスクだけを表示します。
+</p>
+
+<section class="panel routine-panel" aria-labelledby="routines-heading">
+  <div class="section-heading"><div><p class="eyebrow">毎日</p><h2 id="routines-heading">日課と今日の完了</h2></div><span class="section-count">{{ routine_completed_count }}/{{ routines|length }}件</span></div>
+  {% if not routines_available %}
+  <p class="state-message state-warning" role="status">日課テーブルを読み込めませんでした。Botのデータ初期化後に再表示してください。</p>
+  {% elif routines %}
+  <div class="routine-list">{% for routine in routines %}{% include "partials/routine_row.html" %}{% endfor %}</div>
+  <p class="panel-footnote">Discordの <code>/日課一覧</code> と同じローカル完了状態です。完了操作はDiscordの許可された操作から行います。</p>
+  {% else %}
+  <div class="empty-block"><h3>日課はまだありません</h3><p>Discordの許可された生活チャンネルで <code>/日課追加</code> を使うと、毎日のリマインダー対象になります。</p></div>
+  {% endif %}
+</section>
+
+{% if not tasks %}
+<section class="panel task-empty empty" aria-labelledby="empty-tasks-heading">
+  <h2 id="empty-tasks-heading">タスクはまだありません</h2>
+  <p>Discordの許可された生活チャンネルで <code>/task_add</code> を使うと、ここに表示されます。</p>
+</section>
+{% else %}
+<div class="task-sections">
+  <section class="panel task-section" aria-labelledby="open-tasks-heading">
+    <div class="section-heading"><div><p class="eyebrow">Open</p><h2 id="open-tasks-heading">未完了のタスク</h2></div><span class="section-count">{{ open_count }}件</span></div>
+    {% if open_tasks %}
+    <div class="task-list">{% for task in open_tasks %}{% include "partials/task_row.html" %}{% endfor %}</div>
+    {% else %}<p class="empty compact">未完了のタスクはありません。</p>{% endif %}
+  </section>
+
+  <section class="panel task-section" aria-labelledby="completed-tasks-heading">
+    <div class="section-heading"><div><p class="eyebrow">Completed</p><h2 id="completed-tasks-heading">完了済み</h2></div><span class="section-count">{{ completed_count }}件</span></div>
+    {% if completed_tasks %}
+    <div class="task-list completed-task-list">{% for task in completed_tasks %}{% include "partials/task_row.html" %}{% endfor %}</div>
+    {% else %}<p class="empty compact">完了済みのタスクはありません。</p>{% endif %}
+  </section>
+</div>
+{% endif %}
+
+<section class="panel reminder-panel" aria-labelledby="reminder-history-heading">
+  <div class="section-heading"><div><p class="eyebrow">配信の記録</p><h2 id="reminder-history-heading">リマインダー履歴</h2></div><span class="section-count">直近 {{ reminder_deliveries|length }}件</span></div>
+  {% if not reminder_deliveries_available %}
+  <p class="state-message state-warning" role="status">リマインダー履歴を読み込めませんでした。保存済みタスクと日課は表示しています。</p>
+  {% elif reminder_deliveries %}
+  <div class="reminder-list">
+    {% for delivery in reminder_deliveries %}
+    <div class="reminder-row">
+      <div><span class="tag">{{ delivery.phase_label }}</span><strong>{{ delivery.title }}</strong><small>{{ 'タスク' if delivery.subject_type == 'task' else '日課' }} #{{ delivery.subject_id }}</small></div>
+      <div class="reminder-status"><span class="status-badge status-{{ delivery.status_tone }}">{{ delivery.status_label }}</span><small>{{ delivery.attempt_count }}回試行・{{ delivery.updated_label }}</small>{% if delivery.error_label %}<em>{{ delivery.error_label }}</em>{% endif %}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}<p class="empty">リマインダーの配信履歴はまだありません。</p>{% endif %}
+</section>
+{% endblock %}

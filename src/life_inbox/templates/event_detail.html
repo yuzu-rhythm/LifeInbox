@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}記録 #{{ event.id }} | 生活マイページ{% endblock %}
+{% block content %}
+<nav class="breadcrumbs" aria-label="パンくず"><a href="/">概要</a><span aria-hidden="true">›</span><span>記録 #{{ event.id }}</span></nav>
+<div class="page-heading">
+  <div><p class="eyebrow">Event #{{ event.id }}</p><h1>{{ event.title }}</h1><p>{{ event.occurred_label }}・{{ event.status_label }}</p></div>
+  {% if event.amount_label %}<div class="heading-total"><span>支出</span><strong>{{ event.amount_label }}</strong><small>{{ event.category_label }}</small></div>{% endif %}
+</div>
+
+<div class="detail-grid">
+  <section class="panel" aria-labelledby="event-content-heading">
+    <h2 id="event-content-heading">保存内容</h2>
+    <dl class="details"><div><dt>原文</dt><dd class="raw">{{ event.raw_text or '（なし）' }}</dd></div><div><dt>発生日時</dt><dd>{{ event.occurred_label }}</dd></div><div><dt>状態</dt><dd>{{ event.status_label }}</dd></div>{% if event.capture_hint %}<div><dt>入力ヒント</dt><dd>{{ event.capture_hint }}</dd></div>{% endif %}<div><dt>紙へ転記</dt><dd>{{ event.copied_label }}</dd></div>{% if event.account_name %}<div><dt>支払元</dt><dd>{{ event.account_name }}</dd></div>{% endif %}</dl>
+  </section>
+  {% if event.expense %}<section class="panel" aria-labelledby="event-expense-heading"><h2 id="event-expense-heading">支出</h2><dl class="details"><div><dt>店舗</dt><dd>{{ event.expense.merchant }}</dd></div><div><dt>金額</dt><dd>{{ event.expense.amount_label }}</dd></div><div><dt>分類</dt><dd>{{ event.expense.category_label }}</dd></div><div><dt>内容</dt><dd>{{ event.expense.description or 'なし' }}</dd></div><div><dt>信頼度</dt><dd>{{ event.expense.confidence_label }}</dd></div></dl></section>{% endif %}
+  {% if event.meal %}<section class="panel" aria-labelledby="event-meal-heading"><h2 id="event-meal-heading">食事</h2><dl class="details"><div><dt>区分</dt><dd>{{ event.meal.meal_type_label }}</dd></div><div><dt>店・場所</dt><dd>{{ event.meal.restaurant }}</dd></div><div><dt>外食／自炊</dt><dd>{{ event.meal.outside_label }}</dd></div><div><dt>内容</dt><dd>{{ event.meal.description or 'なし' }}</dd></div></dl></section>{% endif %}
+  {% if event.receipt_items %}<section class="panel wide" aria-labelledby="receipt-items-heading"><h2 id="receipt-items-heading">レシート明細</h2><div class="table-panel"><table><thead><tr><th>#</th><th>品目</th><th class="num">数量</th><th class="num">単価</th><th class="num">行合計</th></tr></thead><tbody>{% for item in event.receipt_items %}<tr><td>{{ loop.index }}</td><td>{{ item.name }}</td><td class="num">{{ item.quantity or '—' }}</td><td class="num">{{ item.unit_price_label }}</td><td class="num">{{ item.amount_label }}</td></tr>{% endfor %}</tbody></table></div></section>{% endif %}
+  {% if event.attachments %}<section class="panel wide" aria-labelledby="saved-images-heading"><h2 id="saved-images-heading">保存画像</h2><div class="image-grid">{% for item in event.attachments %}<figure><a href="/attachments/{{ item.id }}" target="_blank" rel="noreferrer noopener"><img src="/attachments/{{ item.id }}" alt="{{ item.filename }}" loading="lazy"></a><figcaption>{{ item.filename }}</figcaption></figure>{% endfor %}</div></section>{% endif %}
+</div>
+{% endblock %}

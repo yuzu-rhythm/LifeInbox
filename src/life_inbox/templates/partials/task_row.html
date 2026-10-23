@@ -1,0 +1,20 @@
+<article id="task-{{ task.id }}" class="task-row{{ ' overdue' if task.is_overdue else '' }}{{ ' completed' if task.status == 'completed' else '' }}">
+  <div class="task-row-main">
+    <div class="task-meta">
+      <span class="tag task-source task-source-{{ task.source }}">{{ task.source_label }}</span>
+      <span class="task-id">#{{ task.id }}</span>
+    </div>
+    <h3>{{ task.title }}</h3>
+    {% if task.description %}<p>{{ task.description }}</p>{% endif %}
+    {% if task.source_url %}<a class="task-source-link" href="{{ task.source_url }}" target="_blank" rel="noreferrer noopener">出典を開く ↗</a>{% endif %}
+  </div>
+  <div class="task-due">
+    <span>{{ '完了日' if task.status == 'completed' else '期限' }}</span>
+    <strong>{{ task.completed_label if task.status == 'completed' else task.due_label }}</strong>
+    {% if task.status == 'completed' %}
+    <small class="status-success">完了済み</small>
+    {% elif task.is_overdue %}
+    <small>期限超過</small>
+    {% endif %}
+  </div>
+</article>

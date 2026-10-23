@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}メモ | 生活マイページ{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><p class="eyebrow">#一言メモ</p><h1>忘れたくない一言</h1><p>AIで言い換えず、Discordへ書いた原文をそのまま保存します。日付を押すと保存元イベントを確認できます。</p></div>
+  <div class="heading-total"><span>保存数</span><strong>{{ memos|length }}件</strong></div>
+</div>
+
+<section class="memo-board" aria-label="メモ一覧">
+  {% for memo in memos %}
+  <article class="card"><a href="/events/{{ memo.event_id }}"><p>{{ memo.body }}</p><footer><time>{{ memo.occurred_label }}</time><span>記録 #{{ memo.event_id }}</span></footer></a></article>
+  {% else %}<p class="empty">#一言メモへ短い文章を送ると、ここへ並びます。</p>{% endfor %}
+</section>
+{% endblock %}

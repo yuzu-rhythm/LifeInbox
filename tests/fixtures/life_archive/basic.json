@@ -1,0 +1,27 @@
+{
+  "entries": [
+    {
+      "schema_version": 1,
+      "source": "fixture",
+      "source_service_id": "fixture-event-001",
+      "revision": 1,
+      "delivery_id": "fixture-delivery-001",
+      "provenance": "local_fixture",
+      "confidence": 0.95,
+      "visibility": "private",
+      "scheduled_at": "2026-08-30T08:00:00+09:00",
+      "occurred_at": "2026-08-30T12:00:00+09:00",
+      "observed_at": "2026-08-30T12:01:00+09:00",
+      "captured_at": "2026-08-30T12:02:00+09:00",
+      "original_text": "fixtureで保存した生活メモ",
+      "attachments": [
+        {
+          "source_attachment_id": "fixture-image-001",
+          "original_filename": "fixture.png",
+          "mime_type": "image/png",
+          "data_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
+        }
+      ]
+    }
+  ]
+}

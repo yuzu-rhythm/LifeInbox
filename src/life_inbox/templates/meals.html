@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}食事 | 生活マイページ{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <div><p class="eyebrow">食事記録</p><h1>食べたものの流れ</h1><p>#食事または#生活-inboxへ、文章・写真・両方を投稿できます。カードを開くと元のイベント詳細を確認できます。</p></div>
+  <div class="heading-total"><span>表示中</span><strong>{{ meals|length }}食</strong><small>外食 {{ outside_count }}回</small></div>
+</div>
+
+<section class="meal-grid" aria-label="食事一覧">
+  {% for item in meals %}
+  <a class="card meal-card" href="/events/{{ item.event_id }}">
+    {% if item.attachment_id %}<img src="/attachments/{{ item.attachment_id }}" alt="{{ item.title }}の食事画像" loading="lazy">{% else %}<div class="meal-placeholder" role="img" aria-label="画像なし">{{ item.meal_icon }}</div>{% endif %}
+    <div><span class="tag">{{ item.meal_type_label }}</span><h2>{{ item.title }}</h2><p>{{ item.description or item.raw_text }}</p><footer><time>{{ item.occurred_label }}</time><span>{{ item.outside_label }}</span></footer></div>
+  </a>
+  {% else %}<p class="empty">食事記録はまだありません。</p>{% endfor %}
+</section>
+{% endblock %}
